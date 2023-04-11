@@ -21,9 +21,6 @@ class MainViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    private val prefs = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
-
-
     private var _text = MutableStateFlow("text")
     val text = _text.asStateFlow()
     fun setText(text: String) {
@@ -57,13 +54,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun saveBySharedPreferences() {
-        val editor = prefs.edit()
+        val editor = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE).edit()
         editor.putString("text", text.value)
         editor.apply()
     }
 
     fun loadBySharedPreferences() {
-        val text = prefs.getString("text", "")
-        Log.d("getPreferenceValue","text is $text")
+        val text =
+            context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE).getString("text", "")
+        Log.d("getPreferenceValue", "text is $text")
     }
 }
