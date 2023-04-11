@@ -4,9 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -44,6 +48,18 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(viewModel: MainViewModel) {
     val text by viewModel.text.collectAsState()
-    TextField(value = text, onValueChange = viewModel::setText)
+    Column {
+        TextField(
+            value = text,
+            onValueChange = viewModel::setText,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Button(onClick = viewModel::saveBySharedPreferences) {
+            Text(text = "save data")
+        }
+        Button(onClick = viewModel::loadBySharedPreferences) {
+            Text(text = "show data")
+        }
+    }
 }
 

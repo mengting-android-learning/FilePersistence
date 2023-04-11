@@ -14,10 +14,16 @@ import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import javax.inject.Inject
 
+private const val FILE_NAME = "data"
+
 @HiltViewModel
 class MainViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    private val prefs = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
+
+
     private var _text = MutableStateFlow("text")
     val text = _text.asStateFlow()
     fun setText(text: String) {
@@ -26,7 +32,7 @@ class MainViewModel @Inject constructor(
 
     fun save() {
         try {
-            val output = context.openFileOutput("data", Context.MODE_APPEND)
+            val output = context.openFileOutput(FILE_NAME, Context.MODE_APPEND)
             val bufferedWriter = BufferedWriter(OutputStreamWriter(output))
             bufferedWriter.use {
                 it.write(text.value)
@@ -39,7 +45,7 @@ class MainViewModel @Inject constructor(
     fun load(): String {
         val content = StringBuilder()
         try {
-            val input = context.openFileInput("data")
+            val input = context.openFileInput(FILE_NAME)
             val reader = BufferedReader(InputStreamReader(input))
             reader.use {
                 reader.forEachLine { content.append(it) }
@@ -48,5 +54,16 @@ class MainViewModel @Inject constructor(
             Log.w("InputFile", e.toString())
         }
         return content.toString()
+    }
+
+    fun saveBySharedPreferences() {
+        val editor = prefs.edit()
+        editor.putString("text", text.value)
+        editor.apply()
+    }
+
+    fun loadBySharedPreferences() {
+        val text = prefs.getString("text", "")
+        Log.d("getPreferenceValue","text is $text")
     }
 }
