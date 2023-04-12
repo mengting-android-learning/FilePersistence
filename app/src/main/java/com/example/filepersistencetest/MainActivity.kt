@@ -91,7 +91,7 @@ fun Greeting(viewModel: MainViewModel) {
         }
         Button(onClick = {
             val cursor = db.query("Book", null, null, null, null, null, null)
-            val rawQuery = db.rawQuery("select * from Book", null)
+//            val cursor = db.rawQuery("select * from Book", null)
             if (cursor.moveToFirst()) {
                 do {
                     val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
@@ -101,6 +101,26 @@ fun Greeting(viewModel: MainViewModel) {
             cursor.close()
         }) {
             Text(text = "query data")
+        }
+        Button(onClick = {
+            db.beginTransaction()
+            try {
+                db.delete("Book",null,null)
+                val values = ContentValues().apply {
+                    put("name","Game of Thrones")
+                    put("author","George Martin")
+                    put("pages",720)
+                    put("price",20.85)
+                }
+                db.insert("Book",null,values)
+                db.setTransactionSuccessful()
+            }catch (e:Exception){
+                e.printStackTrace()
+            }finally {
+                db.endTransaction()
+            }
+        }) {
+            Text(text = "replace data")
         }
     }
 }
