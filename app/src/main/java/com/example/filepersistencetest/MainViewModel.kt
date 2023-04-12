@@ -1,7 +1,10 @@
 package com.example.filepersistencetest
 
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -63,5 +66,27 @@ class MainViewModel @Inject constructor(
         val text =
             context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE).getString("text", "")
         Log.d("getPreferenceValue", "text is $text")
+    }
+
+    inner class MyDatabaseHelper(
+        private val databaseContext: Context = context,
+        name: String,
+        version: Int
+    ) :
+        SQLiteOpenHelper(databaseContext, name, null, version) {
+        private val createBook = "create table Book(" +
+                "id integer primary key autoincrement," +
+                "author text," +
+                "price real," +
+                "pages integer, " +
+                "name text)"
+
+        override fun onCreate(p0: SQLiteDatabase?) {
+            p0?.execSQL(createBook)
+            Toast.makeText(databaseContext, "Create succeeded", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onUpgrade(p0: SQLiteDatabase?, p1: Int, p2: Int) {
+        }
     }
 }

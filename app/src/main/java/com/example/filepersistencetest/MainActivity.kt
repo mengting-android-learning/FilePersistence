@@ -48,6 +48,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(viewModel: MainViewModel) {
     val text by viewModel.text.collectAsState()
+    val myDatabaseHelper = viewModel.MyDatabaseHelper(name = "BookStore.db", version = 1)
     Column {
         TextField(
             value = text,
@@ -59,6 +60,9 @@ fun Greeting(viewModel: MainViewModel) {
         }
         Button(onClick = viewModel::loadBySharedPreferences) {
             Text(text = "show data")
+        }
+        Button(onClick = myDatabaseHelper::getWritableDatabase) {
+            Text(text = "create database")
         }
     }
 }
