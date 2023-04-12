@@ -3,11 +3,18 @@ package com.example.filepersistencetest
 import android.content.Context
 import android.util.Log
 import androidx.core.content.edit
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.IOException
@@ -16,11 +23,17 @@ import java.io.OutputStreamWriter
 import javax.inject.Inject
 
 private const val FILE_NAME = "data"
+private val EXAMPLE_COUNTER = intPreferencesKey("example_counter")
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+    val count: Flow<Int> = context.dataStore.data
+        .map { preferences ->
+            preferences[EXAMPLE_COUNTER] ?: 0
+        }
 
     private var _text = MutableStateFlow("text")
     val text = _text.asStateFlow()
@@ -64,6 +77,15 @@ class MainViewModel @Inject constructor(
         val text =
             context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE).getString("text", "")
         Log.d("getPreferenceValue", "text is $text")
+    }
+
+
+    suspend fun incrementCounter() {
+
+        context.dataStore.edit { settings ->
+            val currentCounterValue = settings[EXAMPLE_COUNTER] ?: 0
+            settings[EXAMPLE_COUNTER] = currentCounterValue + 1
+        }
     }
 
 }

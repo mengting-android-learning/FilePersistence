@@ -17,10 +17,12 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.core.content.contentValuesOf
 import com.example.filepersistencetest.ui.theme.FilePersistenceTestTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -51,6 +53,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(viewModel: MainViewModel, context: Context) {
     val text by viewModel.text.collectAsState()
+    val count by viewModel.count.collectAsState(initial = 0)
+    val scope = rememberCoroutineScope()
     val myDatabaseHelper = MyDatabaseHelper(context, "BookStore.db", 3)
     val db = myDatabaseHelper.writableDatabase
     Column {
@@ -89,7 +93,6 @@ fun Greeting(viewModel: MainViewModel, context: Context) {
         }
         Button(onClick = {
             val cursor = db.query("Book", null, null, null, null, null, null)
-//            val cursor = db.rawQuery("select * from Book", null)
             if (cursor.moveToFirst()) {
                 do {
                     val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
@@ -119,6 +122,13 @@ fun Greeting(viewModel: MainViewModel, context: Context) {
             }
         }) {
             Text(text = "replace data")
+        }
+        Button(onClick = {
+            scope.launch {
+                viewModel.incrementCounter()
+            }
+        }) {
+            Text(text = count.toString())
         }
     }
 }
