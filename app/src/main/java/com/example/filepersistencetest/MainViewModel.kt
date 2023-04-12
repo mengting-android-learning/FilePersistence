@@ -78,7 +78,8 @@ class MainViewModel @Inject constructor(
                 "author text," +
                 "price real," +
                 "pages integer, " +
-                "name text)"
+                "name text," +
+                "category_id integer)"
 
         private val createCategory = "create table Category(" +
                 "id integer primary key autoincrement," +
@@ -88,13 +89,19 @@ class MainViewModel @Inject constructor(
         override fun onCreate(p0: SQLiteDatabase?) {
             p0?.execSQL(createBook)
             p0?.execSQL(createCategory)
+            Log.d("DataBase", p0?.version.toString())
             Toast.makeText(databaseContext, "Create succeeded", Toast.LENGTH_SHORT).show()
         }
 
         override fun onUpgrade(p0: SQLiteDatabase?, p1: Int, p2: Int) {
-            p0?.execSQL("drop table if exists Book")
-            p0?.execSQL("drop table if exists Category")
-            onCreate(p0)
+            if (p1 <= 1) {
+                p0?.execSQL(createCategory)
+                Toast.makeText(databaseContext, "Update v2 succeeded", Toast.LENGTH_SHORT).show()
+            }
+            if (p1 <= 2) {
+                p0?.execSQL("alter table Book add column category_id integer")
+                Toast.makeText(databaseContext, "Update v3 succeeded", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

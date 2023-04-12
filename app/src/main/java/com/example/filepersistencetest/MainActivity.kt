@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(viewModel: MainViewModel) {
     val text by viewModel.text.collectAsState()
-    val myDatabaseHelper = viewModel.MyDatabaseHelper(name = "BookStore.db", version = 2)
+    val myDatabaseHelper = viewModel.MyDatabaseHelper(name = "BookStore.db", version = 3)
     val db = myDatabaseHelper.writableDatabase
     Column {
         TextField(
@@ -64,9 +64,6 @@ fun Greeting(viewModel: MainViewModel) {
         Button(onClick = viewModel::loadBySharedPreferences) {
             Text(text = "show data")
         }
-        Button(onClick = myDatabaseHelper::getWritableDatabase) {
-            Text(text = "create database")
-        }
         Button(onClick = {
             val values = ContentValues().apply {
                 put("name", "The Da Vinci Code")
@@ -78,7 +75,9 @@ fun Greeting(viewModel: MainViewModel) {
         }) {
             Text(text = "add data")
         }
-        Button(onClick = { db.delete("Book", "pages < ?", arrayOf("500")) }) {
+        Button(onClick = {
+            db.delete("Book", "pages < ?", arrayOf("500"))
+        }) {
             Text(text = "delete data")
         }
         Button(onClick = {
@@ -105,18 +104,18 @@ fun Greeting(viewModel: MainViewModel) {
         Button(onClick = {
             db.beginTransaction()
             try {
-                db.delete("Book",null,null)
+                db.delete("Book", null, null)
                 val values = ContentValues().apply {
-                    put("name","Game of Thrones")
-                    put("author","George Martin")
-                    put("pages",720)
-                    put("price",20.85)
+                    put("name", "Game of Thrones")
+                    put("author", "George Martin")
+                    put("pages", 720)
+                    put("price", 20.85)
                 }
-                db.insert("Book",null,values)
+                db.insert("Book", null, values)
                 db.setTransactionSuccessful()
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
-            }finally {
+            } finally {
                 db.endTransaction()
             }
         }) {
