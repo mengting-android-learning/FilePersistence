@@ -1,5 +1,6 @@
 package com.example.filepersistencetest
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -34,7 +35,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting(viewModel = viewModel)
+                    Greeting(viewModel = viewModel, this)
                 }
             }
         }
@@ -48,9 +49,9 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(viewModel: MainViewModel) {
+fun Greeting(viewModel: MainViewModel, context: Context) {
     val text by viewModel.text.collectAsState()
-    val myDatabaseHelper = viewModel.MyDatabaseHelper(name = "BookStore.db", version = 3)
+    val myDatabaseHelper = MyDatabaseHelper(context, "BookStore.db", 3)
     val db = myDatabaseHelper.writableDatabase
     Column {
         TextField(
