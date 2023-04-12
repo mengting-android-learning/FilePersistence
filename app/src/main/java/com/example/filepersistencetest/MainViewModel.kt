@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -56,11 +57,11 @@ class MainViewModel @Inject constructor(
         return content.toString()
     }
 
-    fun saveBySharedPreferences() {
-        val editor = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE).edit()
-        editor.putString("text", text.value)
-        editor.apply()
-    }
+    fun saveBySharedPreferences() =
+        context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE).edit {
+            putString("text", text.value)
+        }
+
 
     fun loadBySharedPreferences() {
         val text =

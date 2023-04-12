@@ -1,6 +1,5 @@
 package com.example.filepersistencetest
 
-import android.content.ContentValues
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -18,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.core.content.contentValuesOf
 import com.example.filepersistencetest.ui.theme.FilePersistenceTestTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -65,12 +65,12 @@ fun Greeting(viewModel: MainViewModel) {
             Text(text = "show data")
         }
         Button(onClick = {
-            val values = ContentValues().apply {
-                put("name", "The Da Vinci Code")
-                put("author", "Dan Brown")
-                put("pages", 454)
-                put("price", 16.96)
-            }
+            val values = contentValuesOf(
+                "name" to "The Da Vinci Code",
+                "author" to "Dan Brown",
+                "pages" to 454,
+                "price" to 16.96
+            )
             db.insert("Book", null, values)
         }) {
             Text(text = "add data")
@@ -81,9 +81,7 @@ fun Greeting(viewModel: MainViewModel) {
             Text(text = "delete data")
         }
         Button(onClick = {
-            val values = ContentValues().apply {
-                put("price", 10.99)
-            }
+            val values = contentValuesOf("price" to 10.99)
             db.update("Book", values, "name = ?", arrayOf("The Da Vinci Code"))
         }) {
             Text(text = "update data")
@@ -105,12 +103,12 @@ fun Greeting(viewModel: MainViewModel) {
             db.beginTransaction()
             try {
                 db.delete("Book", null, null)
-                val values = ContentValues().apply {
-                    put("name", "Game of Thrones")
-                    put("author", "George Martin")
-                    put("pages", 720)
-                    put("price", 20.85)
-                }
+                val values = contentValuesOf(
+                    "name" to "Game of Thrones",
+                    "author" to "George Martin",
+                    "pages" to 720,
+                    "price" to 20.85
+                )
                 db.insert("Book", null, values)
                 db.setTransactionSuccessful()
             } catch (e: Exception) {
