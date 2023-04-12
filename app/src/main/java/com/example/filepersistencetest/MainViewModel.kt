@@ -39,7 +39,7 @@ class MainViewModel @Inject constructor(
         }
 
     private val Context.protoDataStore: DataStore<Count> by dataStore(
-        fileName = "settings.pb",
+        fileName = "count.pb",
         serializer = CountSerializer
     )
 
