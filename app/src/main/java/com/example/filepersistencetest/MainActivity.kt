@@ -1,6 +1,8 @@
 package com.example.filepersistencetest
 
+import android.content.ContentValues
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -48,7 +50,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(viewModel: MainViewModel) {
     val text by viewModel.text.collectAsState()
-    val myDatabaseHelper = viewModel.MyDatabaseHelper(name = "BookStore.db", version = 1)
+    val myDatabaseHelper = viewModel.MyDatabaseHelper(name = "BookStore.db", version = 2)
+    val db = myDatabaseHelper.writableDatabase
     Column {
         TextField(
             value = text,
@@ -63,6 +66,41 @@ fun Greeting(viewModel: MainViewModel) {
         }
         Button(onClick = myDatabaseHelper::getWritableDatabase) {
             Text(text = "create database")
+        }
+        Button(onClick = {
+            val values = ContentValues().apply {
+                put("name", "The Da Vinci Code")
+                put("author", "Dan Brown")
+                put("pages", 454)
+                put("price", 16.96)
+            }
+            db.insert("Book", null, values)
+        }) {
+            Text(text = "add data")
+        }
+        Button(onClick = { db.delete("Book", "pages < ?", arrayOf("500")) }) {
+            Text(text = "delete data")
+        }
+        Button(onClick = {
+            val values = ContentValues().apply {
+                put("price", 10.99)
+            }
+            db.update("Book", values, "name = ?", arrayOf("The Da Vinci Code"))
+        }) {
+            Text(text = "update data")
+        }
+        Button(onClick = {
+            val cursor = db.query("Book", null, null, null, null, null, null)
+            val rawQuery = db.rawQuery("select * from Book", null)
+            if (cursor.moveToFirst()) {
+                do {
+                    val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                    Log.d("DataBase", "book name is $name")
+                } while (cursor.moveToNext())
+            }
+            cursor.close()
+        }) {
+            Text(text = "query data")
         }
     }
 }
