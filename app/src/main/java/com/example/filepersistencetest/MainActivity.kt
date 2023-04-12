@@ -54,6 +54,7 @@ class MainActivity : ComponentActivity() {
 fun Greeting(viewModel: MainViewModel, context: Context) {
     val text by viewModel.text.collectAsState()
     val count by viewModel.count.collectAsState(initial = 0)
+    val protoCount by viewModel.protoCount.collectAsState(initial = 0)
     val scope = rememberCoroutineScope()
     val myDatabaseHelper = MyDatabaseHelper(context, "BookStore.db", 3)
     val db = myDatabaseHelper.writableDatabase
@@ -128,7 +129,14 @@ fun Greeting(viewModel: MainViewModel, context: Context) {
                 viewModel.incrementCounter()
             }
         }) {
-            Text(text = count.toString())
+            Text(text = "Preferences DataStore: $count")
+        }
+        Button(onClick = {
+            scope.launch {
+                viewModel.incrementProtoCounter()
+            }
+        }) {
+            Text(text = "Proto DataStore: $protoCount")
         }
     }
 }

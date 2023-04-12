@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.core.content.edit
 import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import proto.CountOuterClass.Count
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.IOException
@@ -29,11 +31,23 @@ private val EXAMPLE_COUNTER = intPreferencesKey("example_counter")
 class MainViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "preference_settings")
+    //
     val count: Flow<Int> = context.dataStore.data
         .map { preferences ->
             preferences[EXAMPLE_COUNTER] ?: 0
         }
+
+    private val Context.protoDataStore: DataStore<Count> by dataStore(
+        fileName = "settings.pb",
+        serializer = CountSerializer
+    )
+
+    val protoCount: Flow<Int> = context.protoDataStore.data
+        .map { count ->
+            count.exampleCounter
+        }
+
 
     private var _text = MutableStateFlow("text")
     val text = _text.asStateFlow()
@@ -88,4 +102,13 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    suspend fun incrementProtoCounter() {
+        context.protoDataStore.updateData { currentSettings ->
+            currentSettings.toBuilder()
+                .setExampleCounter(currentSettings.exampleCounter + 1)
+                .build()
+        }
+    }
+
 }
+
